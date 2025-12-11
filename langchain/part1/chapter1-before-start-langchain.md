@@ -1,4 +1,4 @@
-# Chapter1. LangChain 시작하기
+# Chapter1. LangChain 시작하기 전에
 
 ## 1. 강의를 보는 방법
 

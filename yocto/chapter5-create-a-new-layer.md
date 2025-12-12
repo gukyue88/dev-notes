@@ -222,8 +222,123 @@ bitbake hello
 
 ## 4. 라이선스
 
+- 리눅스 소프트웨어 스택에는 많은 소프트웨어 패키지로 구성되어 있음
+- 대부분 오픈 소스 라이선이이지만 일부는 상업 라이선스인 경우도 있음
+- Yocto 프로젝트가 가지고 있는 몇가지 라이선스 관리 방법을 살펴보자
+
+#### 라이선스와 관련한 중요 변수
+
+- `LICENSE` : 레시피가 빌드하는 소프트웨어 패키지에 적용된 LICENSE 목록
+  - 모든 레시피들은 라이선스 목록을 LICENSE 변수에 할당해야 함
+  - 만약 LICENSE를 사용하지 않을 경우, 값을 'CLOSED'로 넣음
+  - LICENSE 변수가 'CLOSED'가 아니라면 레시피는 라이선스 파일이 있다는 의미임
+- `LIC_FILES_CHKSUM` : 라이선스 파일과 checksum
+  - checksum으로는 보통 md5, sha256을 사용함
+
+#### 라이선스를 제공하는 방법 3가지
+
+> 여기는 나중에 다시 책을 참고하자
+
+1. 오픈임베디드 코어에서 기본적으로 제공하는 라이선스
+
+- 오픈임베디드 코어 레이어 아래 `meta/files/common-licenses` 디렉터리에는 공통으로 사용할 수 있는 라이선스 텍스트들이 모여있음
+- `COMMON_LICENSE_DIR` 변수가 이 디렉터리를 가킴
+- 그래서 만약, MIT 라이선스를 사용한다면? `LICENSE = "MIT"`, `LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=..."` 처럼 사용
+- 소프트웨어 패키지가 따로 라이선스 텍스트를 갖고 있지 않고, 특정 라이선스를 준수해야 하는 경우? 오픈임베디드 코어에서 제공한 라이선스 텍스트들을 사용하면 됨
+
+2. 라이선스를 갖는 오픈 소스를 사용하거나 자체적으로 라이선스 부여하기
+
+- 이런 경우에는 LICENSE, LIC_FILES_CHKSUM 변수에 적절한 값을 넣어줘야 함
+
+3. 빌드된 레시피의 라이선스 정보 확인
+
+- 빌드가 완료된 레시피의 라이선스 정보는 `build/tmp/deploy/licenses` 디렉터리에 저장됨
+- 레시피 마다 각각 보관됨
+
 ## 5. 레시피 확장 파일
+
+- 앞서 빌드한 실행파일을 타깃 시스템에 넣어 실행해보자
+- 타깃에서 실행파일이 실행되려면 루트 파일 시스템에 포함되어야 함
+- 실행 파일을 루트 파일 스스템에 추가하기 위해서는 실행 파일을 생성하는 레시피의 이름을 `IMAGE_INSTALL` 변수에 추가해야함
+  - 실질적으로 IMAGE_INSTALL에 할당되는 값은 패키지 이름이나, 여기서는 레시피 이름이라고해도 무방해서 레시피 이름이라고 부르겠음
+- `IMAGE_INSTALL` 변수는 루트 파일 시스템 이미지를 생성하는 레시피인 `core-image-minimal.bb` 파일에 존재함
+- 오픈임베디드 코어 디렉터리인 meta에 존재하는 core-image-minmal.bb 파일을 수정하는 것은 바람직하지 않음
+- 우리는 레시피 확장 파일(.bbapend)을 만들어 사용
+
+#### 레이어
+
+- 레이어란 meta-xxx 와 같이 meta-로 시작하는 디렉터리를 가리킴
+- meta-xxx와 같이 이름을 짓는 것은 Yocto의 규약으로 xxx 라는 레이어의 이름임
+- 각각의 레이어들은 우선순위를 가지고 있음
+- 우선순위가 높은 레이어의 레시피 파일이 실행되며 이를 override라고 함
+
+![레이어 우선순위](https://www.dornerworks.com/wp-content/uploads/2019/12/meta-layers.png)
+
+#### 레시피 확장 파일을 통한 hello 실행 파일 추가
+
+> core-image-minimal의 루트 파일 시스템의 /usr/bin에 hello 실행파일 넣고 실행하기!
+
+poky_src/poky/recipes-core/images/core-image-minmal.bbappend
+
+```conf
+IMAGE_INSTALL_append =" hello"
+```
+
+poky_src/poky/meta-hello/conf/layer.conf
+
+```conf
+BBFILES += "${LAYERDIR}/recipes*/*.bb \
+            ${LAYERDIR}/recipes*/*/**.bbappend"
+```
+
+```bash
+bitbake hello -c cleanall && bitbake hello
+bitbake core-imager-minmal -C rootfs
+
+# poky_src/build/tmp/work/qemux86_64-poky-linux/core-image-minimal/1.0-r0/rootfs/usr/bin에 hello 파일 생성 확인
+ls poky_src/build/tmp/work/qemux86_64-poky-linux/core-image-minimal/1.0-r0/rootfs/usr/bin
+
+runqemu core-image-minimal nographic
+
+# root 로그인 후, hello 실행
+hello
+```
+
+#### 레시피 확장 파일들만 추적하는 방법
+
+```bash
+# core-image-minimal 레시피의 레시피 확장 파일 추적하기
+bitbake-layers show-appends | grep "core-image-minimal"
+```
+
+#### 레시피 확장 파일이 적용된 상태 확인하기
+
+여러 레이어에서 사용된 메타데이터들을 단일 계층 디렉터리로 만들어줌
+
+```bash
+bitbake-layers flatten <결과가 저장되는 디렉터리>
+```
 
 ## 6. BBFILE_COLLECTIONS, BBFILE_PATTERN 변수의 역할
 
+- layer.conf 파일에서는 BBFILE_COLLECTIONS와 BBFILE_PATTERN 변수가 사용되ㅑㅁ
+- `BBFILE_COLLECTIONS` : 현재 레이어의 이름
+- `BBFILE_PATTERN` : 차후 bitbake가 특정 레이어에 포함된 레시피 파일들(.bb, .bbappend)를 검색하는데 사용되는 정규표현식으로 레이어의 최상위 디렉터리 이름이 할당됨
+
+#### bitbake가 레시피를 조합하는 과정
+
+- bitbake는 먼저 `BBFILE_COLLECTIONS` 변수에서 특정 레이어 이름을 가져옴
+- `BBFILE_PATTERN`에 해당하는 디렉터리에서 `BBFILES`에 매칭되는 레시피를 찾아냄`BBFILES` 들을 찾음
+
+#### Poky 기반의 환경에서 bitbake 파싱 과정 (p180 그림 5-43 참고!)
+
 ## 7. 요약s
+
+- 여기에서는 새로운 레이어를 만들고 작성해봄
+- bitbake 문법 학습을 통해 기존에 다뤘던 layer.conf, bblayer.conf 등의 환경 설정 파일의 내용을 더 깊게 들여다봄
+- 또, 새로 레시피를 만드는 과정을 따라가며 라이선스 및 레시피 확장 파일의 개념을 이해함
+- 리눅스 소프트웨어 스택은 수많은 오픈 소스 소프트웨어 패키지로 이루어져있고 상당수가 오픈 소스 라이선스에 따라 작성자들에 의해 배포된 것임
+- 특히, GPL 라이선스는 소프트웨어 패키지 바이너리를 빌드하는데 사용한 모든 소스 코드를 공개해야하는 문제가 있음
+- 오픈 소스 라이선스를 관리하는 것은 중욯나 일이며 부하가 많이 걸리는 일이 될 수 있음
+- Yocto는 라이선스 정보 및 소스 코드 관리를 쉽게 처리할 수 있는 방법을 제공하여 이런 불편함을 감소시킴
+- 레시피 확장 파일의 경우 기존에 오픈임베디드 코어에서 제공하는 레시피 파일을 추가 또는 변경하는데 주로 사용됨

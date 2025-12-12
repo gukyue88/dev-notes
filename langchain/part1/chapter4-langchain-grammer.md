@@ -142,3 +142,138 @@ chain = prompt | model | output_parser
 
 chain.invoke(input) # return이 AIMessage가 아닌, metadata만 나옴
 ```
+
+## 6. Chain 추론 과정을 LangSmith에서 확인
+
+- LangSmith에서 위 예제 실행 내용을 확인함ㅁ
+
+## 7. LCEL 인터페이스 - 일괄처리 batch()
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+model = ChatOpenAI()
+prompt = PromptTemplate.from_template("{topic} 에 대하여 3문장으로 설명해줘")
+chain = prompt | model |  StrOutputParser()
+
+data = {"topic" : "멀티모달"}
+
+# stream : 실시간 출력
+for token in chain.stream(data):
+    print(token, end="", flush=True)
+
+# invoke : 호출
+answer = chain.invoke(data)
+print(answer)
+
+# batch : 단위 실행
+# config={"max_concurrency": 3} 를 사용하면 동시 요청수를 3으로 제한할 수 있음
+batch_data = [{"topic": "멀티모달"}, {"topic": "Instagram"}]
+answer = chain.batch(batch_data)
+print(answer[0])
+print(answer[1])
+```
+
+## 8. 비동기 호출 방법
+
+```python
+# astream
+async for token in chain.astream(data):
+  print(token, end="", flush=True)
+
+# ainvoke
+await chain.ainvoke(data)
+
+# abatch
+await chain.abatch(batch_data)
+```
+
+## 병렬체인 구성 (RunnableParallel)
+
+- prompt, llm, parser 등이 모두 Runnable 프로토콜로 구현됨
+- chain은 Runnable 을 묶을 수 있도록 되어있음
+- chain 또한 Runnable이고, 그렇기 때문에 chain끼리 연결도 가능함
+- `RunnableParallel`을 사용하면 chain을 Parallel 하게 수행할 수 있음
+
+```python
+combined = RunnableParallel(capital=chain1, area=chain2)
+answer = combined.invoke({"country":"대한민국"})
+print(answer)
+# combined는 'capital', 'area' 키를 가진 딕셔너리 형태의 답변을 가짐
+
+# batch도 가능함
+combined.batch([{"country":"대한민국"}, {"country": "미국"}])
+```
+
+## 11. 값을 전달해주는 RunnablePassthrough
+
+```python
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = PromptTemplate.from_template("{num} 의 10배는?")
+llm = ChatOpenAI(temperature=0)
+
+chain = prompt | llm
+
+# invoke를 사용한 chain 실행
+response = chain.invoke({"num": 5})
+```
+
+##### RunnablePassthrough를 사용한 예제
+
+```python
+from langchain_core.runnables import RunnablePassthrough
+
+runnalbe_chain = {"num": RunnablePassthrough()} | prompt | ChatOpenAI()
+runnable_chain.invoke(10)
+```
+
+- prompt에는 dict 형태만 들어감
+- 이전에는 invoke할때 prompt에 전달하기 위핸 {} 를 전달함
+- RunnablePassthrough()를 사용하면, invoke시 {}가 아닌 값을 넣을 수 있음
+
+## 12. 병렬로 Runnable을 실행하는 RunnableParallel
+
+```python
+from langchain_core.runnables import RunnableParallel
+
+runnable = RunnableParallel(
+  passed=RunnablePassthrough(),
+  extra=RunnablePassthrough.assign(mult=lambda x: x["num"] * 3),
+  modified=lambda x: x["num"] + 1,
+)
+
+result = runnable.invoke({"num": 1})
+# result : {'passed': {"num": 1}, "extra": {"num": 1, "mult": 3}, "modified": 1}
+```
+
+## 13. RunnableLambda
+
+RunnableLambda를 사용하여 사용자 정의 함수를 매핑할 수 있음?
+
+```python
+# a 파라미터가 존재하나, 실제 사용하지 않음
+# RunnableLambda에 사용되는 함수는 무조건 dict가 넘어갈 매개변수 하나를 가져야함
+def get_today(a):
+  return datetime.today().strftime("%b-%d")
+
+# RunnableLambda가 get_today 함수를 호출해서 today에 매칭, get_today의 파라미터 a의 값에도 3이 들어가긴함
+# RunnablePasstrough는 사용자가 준 파라미터 3이 그대로 감
+chain = (
+  {"today": RunnableLambda(get_today)}, "n": RunnablePassthrough()}
+  | prompt
+  | llm
+  | StrOutputParser()
+)
+
+chain.invoke(3)
+```
+
+#### invoke 안에 여러 파라미터를 주는 방법?
+
+- dict나 list를 사용
+- RunnablePassthrough()는 그대로 dict나 list가 전달됨
+- 만약 dict의 특정 아이템을 얻고 싶다면 itemgetter를 사용

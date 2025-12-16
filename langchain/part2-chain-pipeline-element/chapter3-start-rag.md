@@ -63,4 +63,62 @@ chain = (
 
 ## 3. PDF 문서 기반 QA RAG
 
-## 4~8 프로젝트 진행
+```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.vectorstores import FAISS
+from langchain_core.ouput_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+# 1 단계 : 문서 로드
+loader = PyMuPDFLoader("data/SPRI_AI_Brief_2023년12월호_F.pdf")
+docs = loader.load()
+
+# 2 단계 : 문서 분할
+# chunk_size는 pdf 파일을 보고 문단의 대략적인 크기로 잡아주는게 좋음
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+spilit_documents = text_splitter.split_documents(docs)
+
+# 3 단계 : 임베딩 인스턴스 생성
+embeddings = OpenAIEmbeddings()
+
+# 4 단계 : DB 생성(Create DB) 및 저장 : spit_documents를 임베딩하여 vectorstore에 저장
+vectorstore = FAISS.from_documnets(documents=split_documents, embedding=embeddings)
+
+# 5 단계 : 검색기 (Retriever) 인스턴스 생성
+retriever = vectorstore.as_retriever()
+
+# 6 단계 : 프롬프트 생성 (Create Prompt)
+prompt = PromptTemplate.from_template(
+   """
+You are an assistant for question-answering tasks.
+Use the following pieces of retrieved context to answer the question.
+If you don't know the answer, just say that you don't know.
+Answer in Korean.
+
+#Question:
+{question}
+#Context:
+{context}
+
+#Answer:"""
+)
+
+# 7 단계 : 언어모델(LLM) 생성
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
+
+# 8 단계 : 체인 생성
+chain = (
+   {"context": retriever, "question": RunnablePassthrough()}
+   | prompt
+   | llm
+   | StrOutputParser()
+)
+
+# 체인 실행
+question = "삼성전자가 자체 개발한 AI의 이름은?"
+response = chain.invoke(question)
+print(response)
+```

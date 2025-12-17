@@ -76,8 +76,35 @@ docs = loader.load()
 
 ## 6. WebBase 로더
 
+- `WebBaseLoader` : 웹 기반 문서를 로드하는 로더
+- `bs4` : 웹 페이지 파싱
+  - `bs4.SoupStrainer`를 사용하여 파싱할 요소를 지정
+  - `bs_kwargs` 매개변수를 사용하여 `bs4.SoupStrainer`의 추가적인 인수를 지정함
+
 ## 7. Directory 로더
+
+- `DirecotyLoader` : 디스크에서 파일을 읽어 `Document` 객체로 변환하는 기능
+- 와일드카드 패턴을 포함할 수 있음
+- 멀티스레딩 옵션을 줘서 load를 할 수 있음
+- 특정 로더 지정을 가능함
 
 ## 8. Upstage LayoutAnalysis 로더
 
+- `UpstageLayoutAnalysisLoader` : Upstgage AI에서 제공하는 문서 분석 도구
+- PDF, 이미지 등 다양한 형식의 문서에서 레이아웃 분석 수행
+- OCR 기능 지원 (선택적)
+- Upstage API 키 필요
+- 제외하고 싶은 요소(header, footer등)을 지정 가능
+- 출력 형식을 html로도 지정가능
+  - llm이 이걸 보고 좀 더 분석하기가 좋음
+
 ## 9. LlamaParser 로더
+
+- `LlamaParse`는 LlamaIndex에서 개발한 문서 파싱 서비스
+- PDF, Word, PowerPoint, Excel 등 다양한 문서 형식 지원
+- 자연어 지시를 통한 맞춤형 출력 형식 제공
+- 복잡한 표와 이미지 추출 가능
+- JSON 모드 지원
+- 외국어 지원
+- API 키 별도 필요
+- 멀티모달 지원

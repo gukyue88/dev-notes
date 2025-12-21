@@ -68,7 +68,7 @@ metadata 파일이란 metadata(변수, 태스크)를 기술하는 파일이며, 
   - 계층적 구조 : 레시피에서 설정한 값들이 층층이 쌓여있는 형태로, 그 중 유효한 최종값을 결정함
   - 파이썬 기반 : 파이썬 객체로 구현되어있고, 레시피 안의 파이썬 코드에서 `d.getVar({name})` 형태로 접근 가능
 
-## bitbake 기본 동작
+## bitbake 파싱 순서
 
 ```
 # 시스템 환경 변수
@@ -84,17 +84,21 @@ export BBPATH=/home/gukyue88/bitbake_test
       - layer.conf : BBFILES += "${LAYERDIR}/*.bb", BBPATH .= ":${LAYERDIR}"
     - hello.bb : mylayer의 레시피 파일, PN, PV, DESCRIPTION, do_build 태스크 정의
   - classes
-    - base.bbclass
+    - base.bbclass : `addtask do_build`
 ```
 
-0. bitbake가 시스템 환경 변수 중 일부 (예. `BBPATH`등)를 가져와 Datastore를 초기화함. (앞으로 과정에서도 계속해서 Datastore를 업데이트 함)
-1. `BBPATH`에 저장된 경로들 아래의 conf 디렉터리에서 'bblayers.conf' 환경 설정 파일을 검색함
-2. 'bblayers.conf' 파일의 `BBLAYERS` 변수로 부터 현재 어떤 레이어들이 존재하는지 파악함. (여기에서는 mylayer 존재 파악)
-3. 위에서 파악한 레이어(여기에서는 mylayer)에 가서 'conf/layer.conf' 파일을 찾아 분석함
-4. layer.conf의 `BBFILES`로 해당 레이어의 레시피 파일 위치 확인
-5. laer.conf의 `BBPATH`에 현재 레이어 디렉터리도 추가한 것을 반영
-6. `BBPATH` 경로의 conf 디렉터리 내 bitbake.conf 파일 확인 및 분석
-7. `BBPATH` 경로의 classes 디렉터리에서 클래스 파일 (.bbclass) 위치 확인 및 분석
-8. 분석한 메타데이터들을 기반으로 레시피 파일 분석, 이과정에서 클래스 파일에서 정의된 태스크와 레시피 파일에서 정의된 태스크는 태스크 체인으로 형성돼 실행순서가 정해짐
+#### 1. 환경 설정 파일 분석
 
--> 이부분은 다시 정리 p81쪽도 같이 참고
+1. bitbake가 시스템 환경 변수 중 일부 (예. `BBPATH`등)를 가져와 Datastore를 초기화함. (앞으로 과정에서도 계속해서 Datastore를 업데이트 함)
+2. `BBPATH`에 저장된 경로들 아래의 conf 디렉터리에서 'bblayers.conf' 환경 설정 파일을 검색함
+3. 'bblayers.conf' 파일의 `BBLAYERS` 변수로 부터 현재 어떤 레이어들이 존재하는지 파악함. (여기에서는 mylayer 존재 파악)
+4. 위에서 파악한 레이어(여기에서는 mylayer)에 가서 'conf/layer.conf' 파일을 찾아 분석함
+5. layer.conf의 `BBFILES`로 해당 레이어의 레시피 파일 위치 확인 + `BBPATH`에 현재 레이어 디렉터리도 추가한 것을 반영
+6. `BBPATH` 경로의 conf 디렉터리 내 bitbake.conf 파일 확인 및 분석
+
+#### 2. 클래스 파일 및 레시피 파일 분석
+
+1. `BBPATH` 경로의 classes 디렉터리에서 base.bbclass를 포함한 클래스 파일 (.bbclass) 확인 및 분석
+2. 분석된 환경 설정 파일 및 클래스 파일을 기반으로 해당 레이어의 레시피 파일 (여기에서는 hello.bb)를 분석
+
+> 분석 과정에서 클래스 파일에서 정의된 태스크와 레시피 파일에서 정의된 태스크는 태스크 체인으로 형성돼 실행순서가 정해짐

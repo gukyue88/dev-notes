@@ -11,4 +11,15 @@
 ```bash
 # 버전 확인
 bitbake --version
+
+# 빌드 환경 설정 (build 디렉터리 내 conf 파일 및 templateconf.cfg 파일 생성)
+source {script_name}
+
+# 빌드
+# -k 옵션 : 에러가 나도 끝까지 빌드
+bitbake {recipe_name}
+
+# 변수 값 확인
+# -r 옵션 : 변화 추적
+bitbake-getvar {recipe_name} {var_name}
 ```

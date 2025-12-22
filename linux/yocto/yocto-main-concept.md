@@ -70,37 +70,40 @@ metadata 파일이란 metadata(변수, 태스크)를 기술하는 파일이며, 
 
 ## bitbake 파싱 순서
 
+1. 환경 설정 파일 분석 : bitbake가 시스템 환경 변수 중 일부 (예. `BBPATH` 등)을 가져와 Datastore를 초기화하고, 이를 기반으로 환경 설정 파일(.conf) 파일들을 뒤져가며 환경 변수를 확장해감
+2. 클래스 파일 및 레시피 파일 분석 : 업데이트된 환경 변수를 기반으로 클래스 파일 (.bbclass) 및 레시피 파일 (.bb) 분석
+
+   > 분석 과정에서 클래스 파일에서 정의된 태스크와 레시피 파일에서 정의된 태스크는 태스크 체인으로 형성돼 실행순서가 정해짐
+
+#### Poky의 구조
+
+Poky의 구조는 계층형(layered) 아키텍처로 되어있음 (레이어를 겹쳐 최종 이미지를 만듦)
+
 ```
-# 시스템 환경 변수
-export BBPATH=/home/gukyue88/bitbake_test
-
-# /home/gukyue88/bitbake_test
-- bitbake_test
-  - conf
-    - bblayers.conf : BBLAYERS(layer들의 경로, 여기에서는 mylayer 경로가 추가)
-    - bitbake.conf : PN, TMPDIR, CACHE, T, B등 정의
-  - mylayer : mylayer(custom layer) 용 디렉토리
-    - conf
-      - layer.conf : BBFILES += "${LAYERDIR}/*.bb", BBPATH .= ":${LAYERDIR}"
-    - hello.bb : mylayer의 레시피 파일, PN, PV, DESCRIPTION, do_build 태스크 정의
-  - classes
-    - base.bbclass : `addtask do_build`
+|  other layers  |  # 필요에 따라 추가된 레이어, 이 부분을 개발자가 추가하는 레이어
+| meta-yocto-bsp |  # yocto에서 제공되는 참조 bsp 관련 메타데이터가 존재
+|   meta-poky    |  # yocto에서 제공되는 Poky 참조 배포에 대한 메타데이터가 존재
+| meta (oe-core) |  # 리눅스 배포판을 생성하기 위한 도구, 메타데이터들로 구성된 빌드 프레임워크
 ```
 
-#### 1. 환경 설정 파일 분석
+> Poky를 빌드 시스템 관점에서 말할 때 == 오픈 임베디드 빌드 시스템 == "bitbake" + "오픈 임베디드 코어" 를 의미
 
-1. bitbake가 시스템 환경 변수 중 일부 (예. `BBPATH`등)를 가져와 Datastore를 초기화함. (앞으로 과정에서도 계속해서 Datastore를 업데이트 함)
-2. `BBPATH`에 저장된 경로들 아래의 conf 디렉터리에서 'bblayers.conf' 환경 설정 파일을 검색함
-3. 'bblayers.conf' 파일의 `BBLAYERS` 변수로 부터 현재 어떤 레이어들이 존재하는지 파악함. (여기에서는 mylayer 존재 파악)
-4. 위에서 파악한 레이어(여기에서는 mylayer)에 가서 'conf/layer.conf' 파일을 찾아 분석함
-5. layer.conf의 `BBFILES`로 해당 레이어의 레시피 파일 위치 확인 + `BBPATH`에 현재 레이어 디렉터리도 추가한 것을 반영
-6. `BBPATH` 경로의 conf 디렉터리 내 bitbake.conf 파일 확인 및 분석
+## 오픈임베디드
 
-#### 2. 클래스 파일 및 레시피 파일 분석
+- 오픈임베디드란? 임베디드 장치용 리눅스 배포판을 만드는 데 사용되는 빌드 자동화 프레임워크 및 크로스 컴파일러 환경
+- 레시피를 사용해 소스 코드를 저장소에서 가져오고 필요할 경우 패치를 적용하며 소스 코드를 컴파일 및 링크하고 패키지 및 부팅이 가능한 이미지를 생성함
+- Poky에서 가장 핵심적인 역할을 하는 레이어 == meta 레이어
+- meta 레이어는 다른 말로 `오픈 임베디드 코어` 또는 `oe-core` 라고 부름
+- 권장하는 빌드 시스템으로는 빌드 도구인 bitbake를 사용하고, bitbake는 레시피를 기반으로 빌드를 진행함
 
-1. `BBPATH` 경로의 classes 디렉터리에서 base.bbclass를 포함한 클래스 파일 (.bbclass) 확인 및 분석
-2. 분석된 환경 설정 파일 및 클래스 파일을 기반으로 해당 레이어의 레시피 파일 (여기에서는 hello.bb)를 분석
+#### 오픈임베디드 레이어 (meta-openembedded) vs 오픈임베디드 코어 레이어 (meta)
 
-> 분석 과정에서 클래스 파일에서 정의된 태스크와 레시피 파일에서 정의된 태스크는 태스크 체인으로 형성돼 실행순서가 정해짐
+- 오픈 임베디드 프로젝트 초기에 레시피들의 집합은 `meta-openembedded`에 모두 포함되어 있었음
+- 점점 크기가 커지면서 분할하기 시작했으며, 오픈임베디드 코어가 나오게 됨
+- 오픈 임베디드 코어에는 작고 유용한 임베디드 장치를 구현하는데 필요한 레시피들을 모아놓음
 
-## Poky
+## 빌드 속도 최적화
+
+- 로컬 소스 저장소를 구축하면 팀원들이 외부 저장소에서 소스를 fetch 하는 시간을 줄일 수 있음
+- Yocto에서 제공하는 공유 상태 캐시 (Shared State Cache)를 사용하면 사전에 빌드된 내용을 공유하여 빌드 시간을 줄일 수 있음
+

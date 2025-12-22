@@ -107,3 +107,16 @@ Poky의 구조는 계층형(layered) 아키텍처로 되어있음 (레이어를 
 - 로컬 소스 저장소를 구축하면 팀원들이 외부 저장소에서 소스를 fetch 하는 시간을 줄일 수 있음
 - Yocto에서 제공하는 공유 상태 캐시 (Shared State Cache)를 사용하면 사전에 빌드된 내용을 공유하여 빌드 시간을 줄일 수 있음
 
+## bblayers.conf
+
+> 레이어들이 어떻게 합쳐지는가? bitbake가 BBLAYERS 안에 있는 레이어들을 참고하도록 되어있음
+
+```conf
+BBLAYERS ?= " \
+  /path/to/poky/meta \                # Core 레이어 (기본 OS)
+  /path/to/poky/meta-poky \           # 배포판 설정
+  /path/to/meta-raspberrypi \         # BSP 레이어 (하드웨어 종속)
+  /path/to/meta-openembedded/meta-oe \# 미들웨어
+  /path/to/meta-custom \              # Custom 레이어 (사용자 정의)
+  "
+```

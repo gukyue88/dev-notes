@@ -44,3 +44,35 @@ graph TD
 - 여기서 Agent는 retrieve_tool을 가지고 있음
 
 ## 7. [프로젝트] Adaptive RAG
+
+- Adaptive RAG라는 논문을 참고한 튜토리얼
+- 쿼리 분석과 Self-reflective RAG를 결합한 내용
+- 쿼리 분석은 어떤 툴을 쓸지 고민하는 부분임
+  - question을 보고 web 검색이 필요한지, RAG가 필요한지등을 분기하는 기법
+- Self-reflective RAG란 자가 수정 RAG임
+  - hallucination이나 relevant 체크를 하여 이전 노드로 돌아가는 기법
+
+```mermaid
+graph TD
+    question --> routing
+
+    routing -- web --> web_search
+    web_search --> llm
+
+    routing -- rag --> retrieve
+    retrieve --> grade_documents
+    grade_documents --> llm
+
+    llm --> hallucination{hallucination?}
+    hallucination -- yes --> llm
+    hallucination -- no --> relevant{relevant?}
+
+    relevant -- no --> transform_query
+    transform_query --> retrieve
+
+    relevant -- yes --> END
+```
+
+- 중간에 llm이 많이 들어가면서 퀄리티는 좋아지나, 답변이 나오기까지 시간이 오래걸림
+- 요새는 이 문제를 ux적으로 풀려는 시도가 많음
+  - 중간 과정을 표현한다거나, 더 기다리면 좋은 답변을 얻을 수 있다거나 해서 사용자가 기다리게 함

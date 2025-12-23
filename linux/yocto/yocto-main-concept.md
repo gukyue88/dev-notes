@@ -109,7 +109,10 @@ Poky의 구조는 계층형(layered) 아키텍처로 되어있음 (레이어를 
 
 ## bblayers.conf
 
-> 레이어들이 어떻게 합쳐지는가? bitbake가 BBLAYERS 안에 있는 레이어들을 참고하도록 되어있음
+> 레이어들이 어떻게 합쳐지는가?
+
+- bitbake가 BBLAYERS 안에 있는 레이어들을 참고하도록 되어있음
+- 이미지를 생성해는 레시피는 어떤 패키지가 이미지에 설치되어야 하는지 정의되어야 함 (클래스 파일에 `IMAGE_INSTALL` 변수 활용)
 
 ```conf
 BBLAYERS ?= " \

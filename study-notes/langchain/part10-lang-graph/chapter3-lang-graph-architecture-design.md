@@ -28,4 +28,19 @@ graph TD
 
 ## 6. [프로젝트] Agentic RAG
 
+```mermaid
+graph TD
+    question --> Agent
+
+    Agent -- tools --> retrieve
+    Agent -- no_tools --> END
+
+    retrieve -- need_rewrite --> Agent
+    retrieve -- no_need_rewrite --> generate
+    generate --> END
+```
+
+- Agent를 쓰게 되면 RAG를 쓸지 말지 스스로 결정하게 된다는게 이점임
+- 여기서 Agent는 retrieve_tool을 가지고 있음
+
 ## 7. [프로젝트] Adaptive RAG

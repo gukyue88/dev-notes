@@ -3,7 +3,7 @@
 ## 1. 에이전트간 대화 시뮬레이션
 
 ```mermaid
-graph TD
+flowchart TD
     start(Simulated User Message)
     assistant((AI Assistant))
     user((Simulated User))
@@ -24,7 +24,7 @@ graph TD
 ## 2. 사용자 요구사항 기반 메타 프롬프트 생성 에이전트
 
 ```mermaid
-graph TD
+flowchart TD
     start --> info
 
     info -.-> info
@@ -44,7 +44,7 @@ graph TD
 ## 3. Corrective RAG
 
 ```mermaid
-graph TD
+flowchart TD
     question --> retrieve
     retrieve --> grade_document
 
@@ -53,6 +53,32 @@ graph TD
     grade_document -- not relevant --> query_rewrite
     query_rewrite --> web_search
     web_search --> llm
+
+    llm --> finish
 ```
 
 - Adaptive RAG와의 차이는 문서중에서 관련성이 높은 애들의 개수의 threshold를 정해 모자라면 추가 정보를 얻는 형태
+
+## 4. Self-RAG
+
+```mermaid
+flowchart TD
+    question --> retrieve
+    retrieve --> grade_documents
+
+    grade_documents -- relevant --> generate
+    generate --> hallucination_check
+
+    hallucination_check -- fail --> generate
+    hallucination_check -- pass --> relevance_check
+
+    relevance_check -- pass --> answer
+    relevance_check -- fail --> query_rewrite
+    query_rewrite --> retrieve
+```
+
+- Adaptive RAG와 비슷함.
+- 자기 반성 및 자기 평가를 포함한 RAG 전략을 Self-RAG라고 함
+- RAG 전략은 최신 전략이 달라지모로 최신 경향을 확인해보는 것이 좋음
+
+## 5. Plan and Execute

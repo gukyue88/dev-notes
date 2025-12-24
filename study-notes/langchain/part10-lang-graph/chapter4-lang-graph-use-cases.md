@@ -7,12 +7,12 @@ graph TD
     start(Simulated User Message)
     assistant((AI Assistant))
     user((Simulated User))
-    end(END)
+    finish
 
     start --> assistant
     assistant --> user
     user --> assistant
-    user --> end
+    user --> finish
 ```
 
 - 고객 응대 챗봇을 만들었을 때, 고객응대를 제대로 하는지 검증이 필요함
@@ -28,11 +28,11 @@ graph TD
     start --> info
 
     info -.-> info
-    info -.-> end
+    info -.-> finish
     info -.-> add_tool_message
 
     add_tool_message --> prompt
-    prompt --> end
+    prompt --> finish
 ```
 
 - 메타 프롬프트 : 누군가 나 대신 프롬프트를 만들어주는 것, 일반적으로 llm을 통해 만드는 프롬프트를 의미함

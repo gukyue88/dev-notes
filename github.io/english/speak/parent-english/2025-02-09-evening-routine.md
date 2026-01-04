@@ -1,0 +1,48 @@
+---
+layout: single
+title: "[스픽][엄마빠영어] 저녁 루틴"
+categories: english/speak/parent-english
+---
+
+- Let's get ready for ~
+  - Let's get ready for bedtime. (잘준비하자, 잘 시간이야)
+  - Let's get ready for nap time (낮잠 잘 시간이야)
+- It's night night time (굿나잇 할시간이야.)
+- night night (good night의 귀여운버전의 표현)
+- It's way past ~
+  - It's way past your bedtime (자야할 시간이 훨씬 지났어)
+  - It's way past your nap time
+  - It's way past 10 o'clock (10시가 훨씬 넘었어)
+- Please close your eyes and sleep.
+- Please go to bed and sleep.
+- Sleep tight. (잘자, sleep well은 잘 안씀. 깨지말고 푹자라는 의미)
+- Sweet dreams.
+- Which ~ do you want to ~? (고를 것이 한정적인 거에서는 Which)
+  - Which book do you want to read?
+  - Which movie do you want to watch?
+  - Which game do you want to play?
+- Let's flip the page. (flip : 종이를 휙 넘길때 사용)
+- Next page, please.
+- What ~ is ~?
+  - What's this?
+  - What color is this?
+  - What color is this house?
+  - What color it this car?
+  - What number is this?
+  - What letter is this?
+- What do you think is going to happen next?
+  - What do you think? (어떻게 생각해?)
+- Time for ~ (~할 시간이야.)
+  - Time for a bubble bath.
+  - Time for a shower.
+  - Time for a shampoo.
+- Do you want to ~ or ~ ?
+  - Do you want to take a shower or a bath?
+  - Do you want to go to the park or the playground?
+  - Do you want to your bath toys or the bath crayons?
+- ~ is over. (be over : 어떤 시간이 끝나다)
+  - Bath time is over.
+  - Story time is over.
+- Let's dry off. (몸을 말리자(물기 닦고 말리는 일))
+- Let's dry your hair.
+- Let's brush your teeth.

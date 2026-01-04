@@ -1,0 +1,67 @@
+---
+layout: single
+title: "[스픽][엄마빠영어] 유치원/학교 선생님 상담"
+categories: english/speak/parent-english
+---
+
+- You have to ~ (~해야돼)
+  - You have to get ready for school.
+  - You have to hurry
+  - You have to get ready for the class. (수업 준비)
+  - You have to get ready for bed.
+- Did you pack ~? (~ 챙겼어?)
+  - Did you pack your lunchbox? (도시락가방)
+  - Did you pack your pecil box? (필통)
+  - Did you pack your water bottle?
+  - Did you pack your homework?
+  - DId you pack everything? (다 챙겼어?)
+- Make sure to ~ ( ~ 하도록 해!)
+  - Make sure to keep your mask on.
+  - Make sure to wash your hands.
+  - Make sure to listen to your teacher.
+- Are you ~
+  - Are you tired?
+  - Are you sick? (너 어디 아파?)
+  - Are you hungry?
+  - Are you sleepy?
+- Hi, this is Minsu‘s dad. (전화상에서는 This)
+- can't make it. (make it : 시간에 맞춰 어딘가에 가다)
+  - Minsu can't make it today.
+  - Minsu can't make it to shcool today.
+  - Minsu can't make it to the English lesson today.
+- He's not feeling well. (feel : 몸의 컨디션을 나타낼 때도 쓰임)
+- 아프다
+  - He has a mild fever. (mild fever : 미열)
+  - a tummy ache (배앓이)
+  - a headache (두통)
+  - a cold (감기)
+- How was ~?
+  - How was school today?
+  - How was the taekwondo class?
+  - How was lunch?
+- What did you ~?
+  - What did you learn today?
+  - What did you have for lunch?
+  - What did you have for snack?
+- Did you have fun? (좋은 시간 보냈어?)
+  - Did you have fun at school?
+  - Did you have fun at the filed trip? (field trip : 학교에서 가는 소풍, picnic : 가족/친구끼리 가는 소풍)
+  - Did you have fun at the party?
+- The class starts in 15 minutes.
+- Make sure to ~ before class begins.
+  - Make sure to finish your snack before class begins.
+  - Make sure to clean up your toys before class begins.
+  - Make sure to go to the bathroom before class begins.
+- Focus, please. (집중해)
+- How is he doing ~
+  - How is he doing in class? (애가 수업시간에 어떻게 하고 있나요?)
+  - How is he doing with other kids? (다른 아이들과는 어떻게 지내나요?)
+  - How is he doing with homework? (숙제는 어떻게 하고 있나요?)
+  - How is he doing with in-class activities? (수업 중 활동은 어떻게 하고 있나요?)
+- Does he have any trouble ~?
+  - Does he have any trouble?
+  - Does he have any trouble keeping up in class? (수업 시간에 따라가는 것)
+  - Does he have any trouble getting along with other kids? (get along : 사이좋게 지내다)
+  - Does he have any trouble understanding English? (영어를 이해하는 것)
+- Is there anything we should work on at home? (work on : 무언가 개선하기 위해 시간을 투자해서 노력하다는 느낌)
+- Thank you for all your help. (모든 도움에 감사해요)

@@ -15,6 +15,8 @@
 
 manifest를 모아놓은 저장소에 있는 xml 중 특정 xml 기준으로 repo를 구성함 (`.repo` 디렉토리 생성)
 
+- 해당 xml 안에서는 또다른 xml을 include 할 수 있음
+
 ```bash
 # -u : manifest URL 지정 (git 저장소의 url)
 # -b : 특정 브랜치 지정 (예: main)
